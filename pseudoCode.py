@@ -17,9 +17,10 @@ mazeNodeList = []
 
 class MazeNode:
 	nextNode = None
-	def __init__(self,x,y,previousMazeNode,isCurrent):
+	def __init__(self,x,y,previousMazeNode):
 		self.x = x
 		self.y = y
+		self.previousMazeNode = previousMazeNode
 
 	def setMazeValue(value):
 		MazeMatrix[self.x][self.y] = value
