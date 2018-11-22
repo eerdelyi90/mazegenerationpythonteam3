@@ -1,30 +1,52 @@
 import os
 import random
 from time import sleep
-# hello init file
 
-# WALL = 'o'
-# Space = ' '
-sizex = 20
-sizey = 20
-MazeMatrix = [[0 for x in range(sizex)] for y in range(sizey)] 
-mazeNodeList = []
-directions = [[0,1],[1,0],[-1,0],[0,-1]]
 
-currentstep = 0
+SIZEX = 30
+SIZEY = 30
+DIRECTIONS = [[0,1],[1,0],[-1,0],[0,-1]]
+STEPS = 200
 
-numberOfSteps = 25
+
+class MazeMatrix:
+    def __init__(self, sizex, sizey):
+        self.matrix = [[0 for x in range(SIZEX)] for y in range(SIZEY)] 
+        self.nodeList = []
+
+    def runMaze(self, currentstep, currentNode):        
+        if (currentstep < STEPS ):
+            currentstep = currentstep + 1
+            if (len(self.nodeList) <= 0):
+                currentNode = MazeNode(0,0,None,self)
+                self.nodeList.append(currentNode)
+            
+            if(currentNode.hasNoOptions()):
+                currentNode = currentNode.previousMazeNode
+            else:
+                currentNode.setMazeValue(True)
+                # display current state of maze
+                _ = os.system("clear")
+                display_grid(self.matrix)
+                sleep(0.08)
+
+                nextNode = currentNode.createNextMazeNode()
+                currentNode = nextNode
+                self.nodeList.append(currentNode)
+                self.runMaze(currentstep, currentNode)
+        else:
+            return
 
 
 class MazeNode:
     value = False
-    def __init__(self,x,y,previousMazeNode,isCurrent):
+    def __init__(self,x,y,previousMazeNode, maze):
         self.x = x
         self.y = y
         self.previousMazeNode = previousMazeNode
 
     def setMazeValue(self, value):
-        MazeMatrix[self.x][self.y] = value
+        maze.matrix[self.x][self.y] = value
 
     def hasNoOptions(self):
         return False
@@ -32,9 +54,8 @@ class MazeNode:
     def createNextMazeNode(self):
         nextNode = None
         rand = random.randrange(4)
-        nextCoords = directions[rand]
-        x_new = self.x + nextCoords[0]
-        y_new = self.y + nextCoords[1]
+        nextCoords = DIRECTIONS[rand]
+        x_new, y_new = (self.x + nextCoords[0], self.y + nextCoords[1])
         if not in_grid(x_new, y_new):
             nextNode = self.createNextMazeNode()
         else: 
@@ -42,6 +63,7 @@ class MazeNode:
         return nextNode
 
 
+# helper functions
 def display_line(line):
     print(
         ''.join((" " if cell is True else "x" for cell in line))
@@ -51,47 +73,9 @@ def display_grid(grid):
     for line in grid:
         display_line(line)
 
-
 def in_grid(x, y):
-    return 0 <= x < sizex and 0 <= y < sizey
-
-firstNode = MazeNode(0, 0, None, True)
-firstNode.setMazeValue(True)
-
-# loop until done (PROBS A WHILE loop)
-
-def runMaze():
-
-    global currentstep
-    global currentNode
-    print(currentstep)
-    if (currentstep < numberOfSteps ):
-        currentstep = currentstep + 1
-        if (len(mazeNodeList) <= 0):
-            currentNode = MazeNode(0,0,None,True)
-            mazeNodeList.append(currentNode)
-        
-        #currentNode.setMazeValue()
-        if(currentNode.hasNoOptions()):
-            currentNode = currentNode.previousMazeNode
-        else:
-            currentNode.setMazeValue(True)
-            nextNode = currentNode.createNextMazeNode()
-            currentNode = nextNode
-            mazeNodeList.append(currentNode)
-            runMaze()
-    else:
-        return
-        #stop
+    return 0 <= x < SIZEX and 0 <= y < SIZEY
 
 
-runMaze()
-
-
-# while True:
-#     _ = os.system("clear")
-#     grid = update_grid(grid)
-#     display_grid(grid)
-#     sleep(0.5)
-
-display_grid(MazeMatrix)
+maze = MazeMatrix(SIZEX, SIZEY)
+maze.runMaze(0,None)
